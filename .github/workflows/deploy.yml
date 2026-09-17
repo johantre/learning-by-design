@@ -1,0 +1,48 @@
+name: Deploy Apps Script
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Validate credentials before installing anything — no point spending
+      # time on `npm install` if this is going to fail anyway.
+      - name: Validate credentials
+        env:
+          CLASPRC_JSON_LEARNING_BY_DESIGN: ${{ secrets.CLASPRC_JSON_LEARNING_BY_DESIGN }}
+        run: |
+          if [ -z "$CLASPRC_JSON_LEARNING_BY_DESIGN" ]; then
+            echo "CLASPRC_JSON_LEARNING_BY_DESIGN repository secret is not set (Settings > Secrets and variables > Actions) — aborting." >&2
+            exit 1
+          fi
+          echo "$CLASPRC_JSON_LEARNING_BY_DESIGN" | base64 -d > ~/.clasprc.json
+          if ! node -e "JSON.parse(require('fs').readFileSync(process.env.HOME + '/.clasprc.json', 'utf8'))"; then
+            echo "Decoded ~/.clasprc.json is not valid JSON — check that CLASPRC_JSON_LEARNING_BY_DESIGN is the base64 of the FULL .clasprc.json file, with no extra whitespace/newlines added when pasting it into the secret." >&2
+            exit 1
+          fi
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      # unlike gmail-team-capacity's bound script, this is a Web App — a new
+      # deployment version is required for the live URL to serve the updated
+      # code, so `clasp push` alone is not enough here.
+      #
+      # --deploymentId pins this to the SAME deployment (and therefore the
+      # same /exec URL) every time. Without it, `clasp deploy` creates a
+      # brand new deployment with a DIFFERENT URL on every run — which would
+      # silently break the Notion webhook (still pointing at the old URL)
+      # the next time this pipeline runs.
+      - name: Push and deploy
+        run: |
+          clasp push --force
+          clasp deploy --deploymentId AKfycbxbf8-OMeGFQCHKU1HR9p0K48bh41K91K5p6eIvTTUze2HolUfffcSQRrV_adwayZDg --description "Deploy from GitHub Actions - run $GITHUB_RUN_NUMBER"
