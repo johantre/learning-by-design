@@ -1,8 +1,19 @@
 name: Deploy Apps Script
 
+# Bitbucket (collaboration-tooling/bitbucket-pipelines.yml, "Deploy
+# learning-by-design" step) stays the leading/authoritative pipeline for
+# this project and auto-deploys on every push to main there. This workflow
+# targets the SAME Apps Script deployment, so it is intentionally
+# dispatch-only rather than push-triggered — running both on every push
+# would race to deploy the same target from two places. Trigger manually
+# only for a deliberate one-off GitHub-only deploy.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  # Same deployment as Bitbucket's LEARNING_BY_DESIGN_DEPLOYMENT_ID — keep
+  # both in sync if this ID is ever rotated.
+  APPS_SCRIPT_DEPLOYMENT_ID: AKfycbxbf8-OMeGFQCHKU1HR9p0K48bh41K91K5p6eIvTTUze2HolUfffcSQRrV_adwayZDg
 
 jobs:
   deploy:
@@ -45,4 +56,4 @@ jobs:
       - name: Push and deploy
         run: |
           clasp push --force
-          clasp deploy --deploymentId AKfycbxbf8-OMeGFQCHKU1HR9p0K48bh41K91K5p6eIvTTUze2HolUfffcSQRrV_adwayZDg --description "Deploy from GitHub Actions - run $GITHUB_RUN_NUMBER"
+          clasp deploy --deploymentId "$APPS_SCRIPT_DEPLOYMENT_ID" --description "Deploy from GitHub Actions - run $GITHUB_RUN_NUMBER"
