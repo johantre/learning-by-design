@@ -175,3 +175,21 @@ Or just push to `main` — the Bitbucket pipeline does the same via the
 - Tech Council (key `TC`) — escalated postmortems land here as 🩺🧟-prefixed
   Task tickets in "To Do" (`create_tech_council_jira_ticket` tool, see
   `JiraApi.gs`)
+
+## 📜 License
+
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). This means you can:
+
+- Share: Copy and redistribute the material in any medium or format
+- Adapt: Remix, transform, and build upon the material
+
+Under the following terms:
+- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made.
+- NonCommercial: You may not use the material for commercial purposes.
+- No additional restrictions: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+**Made with ❤️ for efficiency and automation**
